@@ -2696,9 +2696,11 @@
 
     function confirmDeleteVendor() {
       const vendorId = document.getElementById("deleteTargetVendorId").value;
-      const actorName = document.getElementById("deleteActorSelect").value;
+      const actorSelect = document.getElementById("deleteActorSelect");
+      const actorName = actorSelect ? actorSelect.value : "";
       if (!actorName) {
         showToast("Please select who is deleting this record.", "warning");
+        if (actorSelect) actorSelect.focus();
         return;
       }
       setActiveUser(actorName);
@@ -2713,44 +2715,6 @@
       const archivedRecord = {
         ...v,
         deletedBy: actorName,
-        deletedAt: formatAuditTimestamp(),
-        deleteReason: reason
-      };
-
-      deletedVendors.unshift(archivedRecord);
-      vendors = vendors.filter(item => item.id !== vendorId);
-      saveVendorsToStorage();
-      closeDeleteModal();
-      renderAllViews();
-      showToast(`Moved ${v.company} to Deleted Leads Archive (by ${actorName}).`, "warning");
-    }
-
-    function deleteVendor(vendorId) {
-      const v = vendors.find(item => item.id === vendorId);
-      if (!v) return;
-      document.getElementById("deleteTargetVendorId").value = v.id;
-      document.getElementById("deleteTargetCompanyName").textContent = v.company;
-      document.getElementById("deleteActorName").textContent = currentUserName;
-      document.getElementById("deleteReasonInput").value = "";
-      document.getElementById("deleteReasonModal").classList.remove("hidden");
-    }
-
-    function closeDeleteModal() {
-      document.getElementById("deleteReasonModal").classList.add("hidden");
-    }
-
-    function confirmDeleteVendor() {
-      const vendorId = document.getElementById("deleteTargetVendorId").value;
-      const reason = document.getElementById("deleteReasonInput").value.trim() || "Archived by team member";
-      const v = vendors.find(item => item.id === vendorId);
-      if (!v) {
-        closeDeleteModal();
-        return;
-      }
-
-      const archivedRecord = {
-        ...v,
-        deletedBy: currentUserName,
         deletedAt: formatAuditTimestamp(),
         deleteReason: reason
       };
@@ -3049,78 +3013,6 @@
           <span class="text-[10px] text-slate-400 shrink-0">${escapeHtml(c.timestamp)}</span>
         </div>
       `).join("");
-    }
-
-    function renderDirectoryTable(list) {
-      const tbody = document.getElementById("directoryTableBody");
-      tbody.innerHTML = "";
-
-      list.forEach(v => {
-        const isLead = v.status === "Lead";
-        const allStates = Array.from(new Set([v.hqState, ...(v.coverageStates || [])])).filter(Boolean);
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-[#F4F7FB] transition";
-
-        tr.innerHTML = `
-          <td class="py-3.5 px-4 align-top">
-            <div class="font-bold text-[#0D2561]">${escapeHtml(v.company)}</div>
-            <div class="flex items-center gap-1.5 mt-1">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isLead ? 'bg-[#FBC738]/30 text-[#0D2561]' : 'bg-[#0095D9]/15 text-[#0D2561]'}">
-                ${isLead ? 'Lead' : 'Active'}
-              </span>
-              ${v.statewide ? `<span class="px-2 py-0.5 rounded-full bg-[#0D2561] text-[#FBC738] text-[10px] font-bold">Statewide</span>` : ''}
-            </div>
-          </td>
-          <td class="py-3.5 px-4 align-top text-xs">
-            <div class="font-bold text-[#0D2561]">${escapeHtml(v.repName)}</div>
-            <div class="text-slate-500">${escapeHtml(v.position)}</div>
-            <div class="text-[#0095D9] mt-0.5">${escapeHtml(v.email)}</div>
-            <div class="text-slate-700 font-medium">${escapeHtml(v.phone)}</div>
-          </td>
-          <td class="py-3.5 px-4 align-top text-xs">
-            <div><strong>HQ:</strong> ${escapeHtml(v.hqCity)}, ${escapeHtml(v.hqState)}</div>
-            <div class="text-[#0095D9] font-bold mt-0.5">States: ${allStates.join(", ")}</div>
-            ${(v.coverageCities && v.coverageCities.length > 0) ? `<div class="text-slate-500 text-[11px] mt-0.5">${escapeHtml(v.coverageCities.join(", "))}</div>` : ''}
-          </td>
-          <td class="py-3.5 px-4 align-top">
-            <div class="flex flex-wrap gap-1 max-w-xs">
-              ${(v.services || []).map(svc => `<span class="px-2 py-0.5 rounded bg-[#EBF1F8] text-[#0D2561] text-[10px] font-semibold">${escapeHtml(svc)}</span>`).join("")}
-            </div>
-          </td>
-          <td class="py-3.5 px-4 align-top text-right whitespace-nowrap">
-            <div class="inline-flex items-center gap-1.5">
-              <button onclick="focusVendorOnMap('${v.id}')" title="Map" class="px-2.5 py-1.5 rounded-lg bg-[#EBF1F8] hover:bg-[#0D2561] hover:text-white text-[#0D2561] text-xs font-bold transition">
-                <i class="fa-solid fa-map-pin"></i>
-              </button>
-              <button onclick="openVendorModal('${v.id}')" title="Edit" class="px-2.5 py-1.5 rounded-lg bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] text-xs font-bold transition">
-                <i class="fa-solid fa-pen"></i>
-              </button>
-              <button onclick="deleteVendor('${v.id}')" title="Delete" class="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-600 text-xs font-bold transition">
-                <i class="fa-solid fa-trash"></i>
-              </button>
-            </div>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function promoteLeadToActive(vendorId) {
-      const idx = vendors.findIndex(v => v.id === vendorId);
-      if (idx === -1) return;
-      vendors[idx].status = "Active";
-      saveVendorsToStorage();
-      renderAllViews();
-      showToast(`${vendors[idx].company} promoted to Active Vendor Partner!`);
-    }
-
-    function deleteVendor(vendorId) {
-      const v = vendors.find(item => item.id === vendorId);
-      if (!v) return;
-      vendors = vendors.filter(item => item.id !== vendorId);
-      saveVendorsToStorage();
-      renderAllViews();
-      showToast(`Removed ${v.company} from tracker.`, "warning");
     }
 
     // 10. ADD / EDIT VENDOR MODAL LOGIC
