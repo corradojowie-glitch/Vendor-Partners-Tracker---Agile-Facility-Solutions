@@ -130,8 +130,9 @@
             <h1 class="font-display font-extrabold text-lg sm:text-xl tracking-tight text-white">
               Agile Facility Solutions - Vendor Partners
             </h1>
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#0095D9]/20 text-[#7dd3fc] border border-[#0095D9]/40">
-              <span class="w-1.5 h-1.5 rounded-full bg-[#FBC738]"></span> Team Hub
+            <span id="cloudSyncBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#0095D9]/20 text-[#7dd3fc] border border-[#0095D9]/40">
+              <span id="cloudSyncDot" class="w-2 h-2 rounded-full bg-[#FBC738] animate-pulse"></span>
+              <span id="cloudSyncText">Connecting Live Sync...</span>
             </span>
           </div>
           <p class="text-xs sm:text-sm text-slate-200 mt-0.5 flex items-center gap-1.5">
@@ -237,7 +238,7 @@
             <span class="w-2.5 h-2.5 rounded-full bg-[#0095D9]"></span>
             <span><strong>Pro Tip:</strong> Many partners (like our Tampa, FL team) cover an entire state beyond their HQ city—check the <span class="text-[#0095D9] font-bold">Statewide Coverage</span> tags!</span>
           </div>
-          <span class="text-slate-500 font-medium">Auto-saves locally in your browser</span>
+          <span id="syncFooterNote" class="text-[#0095D9] font-bold">Live Cloud Sync enabled — updates appear in real time for your entire team</span>
         </div>
       </div>
 
@@ -456,198 +457,158 @@
       </div>
     </section>
 
-
     <!-- ===================================================================== -->
-    <!-- PAGE 2: VENDOR & LEAD DIRECTORY (ADD, EDIT, FILTER & EXPORT)          -->
+    <!-- PAGE 2: VENDOR & LEAD DIRECTORY                                       -->
     <!-- ===================================================================== -->
     <section id="page-directory" class="hidden fade-in space-y-6">
-      
-      <!-- Top Control & Smart Filter Bar -->
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
           <div>
-            <h2 class="font-display text-2xl font-extrabold text-[#0D2561]">Vendor & Lead Directory</h2>
-            <p class="text-sm text-slate-600 mt-1">
-              Manage active vendor partners and incoming leads. Filter by any of our <strong class="text-[#0D2561]">14 core services</strong>, <strong class="text-[#0D2561]">all 50 US states</strong>, or specific service cities.
-            </p>
+            <h2 class="font-display font-extrabold text-xl text-[#0D2561]">Vendor Partner & Lead Directory</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Filter by any of our 14 core facility services, all 50 US states, city, or status—and track team updates & comments.</p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <button onclick="exportFilteredCSV()" class="px-3.5 py-2 rounded-xl bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] font-bold text-xs border border-slate-200 transition flex items-center gap-1.5">
-              <i class="fa-solid fa-file-csv text-[#0095D9]"></i> Export CSV
+            <div class="bg-[#EBF1F8] p-1 rounded-lg border border-slate-200 flex items-center gap-1">
+              <button id="btnCardView" onclick="setDirectoryView('cards')" class="px-3 py-1 rounded-md text-xs font-bold bg-white text-[#0D2561] shadow-sm flex items-center gap-1.5">
+                <i class="fa-solid fa-grip"></i> Cards
+              </button>
+              <button id="btnTableView" onclick="setDirectoryView('table')" class="px-3 py-1 rounded-md text-xs font-semibold text-slate-600 hover:text-[#0D2561] flex items-center gap-1.5">
+                <i class="fa-solid fa-table-list"></i> Table
+              </button>
+            </div>
+            <button onclick="exportFilteredCSV()" class="px-3 py-2 rounded-xl bg-[#0D2561] hover:bg-[#13327A] text-white text-xs font-bold transition flex items-center gap-1.5">
+              <i class="fa-solid fa-file-csv text-[#FBC738]"></i> Export CSV
             </button>
-            <button onclick="openVendorModal()" class="px-4 py-2 rounded-xl bg-[#0D2561] hover:bg-[#13327A] text-white font-bold text-xs sm:text-sm shadow transition flex items-center gap-1.5">
-              <i class="fa-solid fa-plus text-[#FBC738]"></i> Add New Vendor / Lead
+            <button onclick="openVendorModal()" class="px-3.5 py-2 rounded-xl bg-[#FBC738] hover:bg-[#facc15] text-[#0D2561] text-xs font-extrabold shadow-sm transition flex items-center gap-1.5">
+              <i class="fa-solid fa-plus"></i> Add Vendor / Lead
             </button>
           </div>
         </div>
 
-        <!-- 5-Way Automation Filter Controls -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
-          <div class="lg:col-span-3">
-            <label class="block text-xs font-bold text-[#0D2561] mb-1">Keyword Search</label>
-            <div class="relative">
-              <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs absolute left-3 top-1/2 -translate-y-1/2"></i>
-              <input type="text" id="filterSearch" oninput="applyDirectoryFilters()" placeholder="Company, rep, phone, notes..." class="w-full pl-8 pr-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
-            </div>
+        <!-- 5-Way Filter Bar -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 bg-[#F4F7FB] p-4 rounded-xl border border-slate-200">
+          <div>
+            <label class="block text-[11px] font-bold text-[#0D2561] mb-1">Keyword / Contact</label>
+            <input type="text" id="filterSearch" oninput="applyDirectoryFilters()" placeholder="Company, CEO, email..." class="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0095D9] outline-none" />
           </div>
-
-          <div class="lg:col-span-3">
-            <label class="block text-xs font-bold text-[#0D2561] mb-1">Service Capability (14 Trades)</label>
-            <select id="filterService" onchange="applyDirectoryFilters()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-[#0095D9] outline-none">
+          <div>
+            <label class="block text-[11px] font-bold text-[#0D2561] mb-1">Service Capability (14)</label>
+            <select id="filterService" onchange="applyDirectoryFilters()" class="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0095D9] outline-none">
               <option value="ALL">All 14 Facility Services</option>
             </select>
           </div>
-
-          <div class="lg:col-span-2">
-            <label class="block text-xs font-bold text-[#0D2561] mb-1">US State (All 50)</label>
-            <select id="filterState" onchange="applyDirectoryFilters()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-[#0095D9] outline-none">
-              <option value="ALL">All 50 States</option>
+          <div>
+            <label class="block text-[11px] font-bold text-[#0D2561] mb-1">State Coverage (50 States)</label>
+            <select id="filterState" onchange="applyDirectoryFilters()" class="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0095D9] outline-none">
+              <option value="ALL">All 50 US States</option>
             </select>
           </div>
-
-          <div class="lg:col-span-2">
-            <label class="block text-xs font-bold text-[#0D2561] mb-1">City / Metro Coverage</label>
-            <input type="text" id="filterCity" oninput="applyDirectoryFilters()" placeholder="e.g. Tampa, Orlando..." class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
+          <div>
+            <label class="block text-[11px] font-bold text-[#0D2561] mb-1">City</label>
+            <input type="text" id="filterCity" oninput="applyDirectoryFilters()" placeholder="e.g. Tampa, Dallas..." class="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0095D9] outline-none" />
           </div>
-
-          <div class="lg:col-span-2">
-            <label class="block text-xs font-bold text-[#0D2561] mb-1">Partner Status</label>
-            <select id="filterStatus" onchange="applyDirectoryFilters()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-[#0095D9] outline-none">
+          <div>
+            <label class="block text-[11px] font-bold text-[#0D2561] mb-1">Partner Status</label>
+            <select id="filterStatus" onchange="applyDirectoryFilters()" class="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0095D9] outline-none">
               <option value="ALL">All (Active & Leads)</option>
-              <option value="Active">Active Partners Only</option>
+              <option value="Active">Active Vendor Partners</option>
               <option value="Lead">Leads / In Vetting</option>
             </select>
           </div>
         </div>
 
-        <!-- Results Status Bar & Card/Table View Toggle -->
-        <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
-          <div class="flex items-center gap-3">
-            <span id="directoryResultCount" class="text-xs font-bold text-[#0D2561]">Showing 0 vendors</span>
-            <button onclick="resetDirectoryFilters()" class="text-xs font-semibold text-[#0095D9] hover:underline">
-              Reset Filters
-            </button>
-          </div>
-
-          <div class="flex items-center gap-1 bg-[#EBF1F8] p-1 rounded-lg border border-slate-200">
-            <button id="btnCardView" onclick="setDirectoryView('cards')" class="px-3 py-1 rounded-md text-xs font-bold bg-white text-[#0D2561] shadow-sm flex items-center gap-1.5">
-              <i class="fa-solid fa-grip"></i> Cards
-            </button>
-            <button id="btnTableView" onclick="setDirectoryView('table')" class="px-3 py-1 rounded-md text-xs font-semibold text-slate-600 hover:text-[#0D2561] flex items-center gap-1.5">
-              <i class="fa-solid fa-table-list"></i> Table
-            </button>
-          </div>
+        <div class="flex items-center justify-between text-xs">
+          <span id="directoryResultCount" class="font-bold text-[#0D2561]">Showing 0 vendors</span>
+          <button onclick="resetDirectoryFilters()" class="text-[#0095D9] hover:underline font-bold">
+            <i class="fa-solid fa-rotate-left mr-1"></i> Reset All Filters
+          </button>
         </div>
       </div>
 
       <!-- Empty Filter State -->
-      <div id="directoryEmptyState" class="hidden bg-white rounded-2xl border border-slate-200 p-10 text-center space-y-3">
+      <div id="directoryEmptyState" class="hidden bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3">
         <div class="w-12 h-12 rounded-full bg-[#EBF1F8] text-[#0095D9] flex items-center justify-center mx-auto text-xl">
           <i class="fa-solid fa-filter-circle-xmark"></i>
         </div>
-        <h3 class="font-display font-bold text-lg text-[#0D2561]">No matching vendor partners or leads found</h3>
-        <p class="text-xs text-slate-500 max-w-md mx-auto">
-          Try clearing your active filters or add a new vendor partner/lead covering this state or service capability.
-        </p>
-        <div class="pt-2 flex justify-center gap-2">
-          <button onclick="resetDirectoryFilters()" class="px-4 py-2 rounded-xl bg-[#EBF1F8] text-[#0D2561] font-bold text-xs">
-            Clear All Filters
-          </button>
-          <button onclick="openVendorModal()" class="px-4 py-2 rounded-xl bg-[#0D2561] text-white font-bold text-xs">
-            + Add New Vendor / Lead
-          </button>
+        <h3 class="font-display font-bold text-base text-[#0D2561]">No matching vendor partners or leads found</h3>
+        <p class="text-xs text-slate-500 max-w-md mx-auto">Try clearing one of your filters or add a new vendor partner for this service and state.</p>
+        <div class="flex justify-center gap-2 pt-2">
+          <button onclick="resetDirectoryFilters()" class="px-4 py-2 rounded-xl bg-[#EBF1F8] text-[#0D2561] text-xs font-bold">Clear Filters</button>
+          <button onclick="openVendorModal()" class="px-4 py-2 rounded-xl bg-[#FBC738] text-[#0D2561] text-xs font-extrabold">+ Add New Vendor</button>
         </div>
       </div>
 
-      <!-- Card Grid View -->
-      <div id="directoryCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        <!-- Vendor cards populated dynamically -->
-      </div>
+      <!-- Cards Grid View -->
+      <div id="directoryCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
 
-      <!-- Compact Table View -->
+      <!-- Table View -->
       <div id="directoryTableContainer" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="bg-[#0D2561] text-white text-xs uppercase tracking-wider">
-              <th class="py-3 px-4 font-bold">Company & Status</th>
-              <th class="py-3 px-4 font-bold">Representative & Contact</th>
-              <th class="py-3 px-4 font-bold">HQ & State Coverage</th>
-              <th class="py-3 px-4 font-bold">Service Capabilities</th>
-              <th class="py-3 px-4 font-bold text-right">Actions</th>
+              <th class="py-3 px-4">Company & Audit</th>
+              <th class="py-3 px-4">Representative</th>
+              <th class="py-3 px-4">HQ & Coverage</th>
+              <th class="py-3 px-4">Services</th>
+              <th class="py-3 px-4 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody id="directoryTableBody" class="divide-y divide-slate-200 text-sm">
-            <!-- Table rows populated dynamically -->
-          </tbody>
+          <tbody id="directoryTableBody" class="divide-y divide-slate-200 text-xs"></tbody>
         </table>
       </div>
     </section>
-
 
     <!-- ===================================================================== -->
     <!-- PAGE 3: SITE PROXIMITY AND DRIVE TIME ESTIMATOR                       -->
     <!-- ===================================================================== -->
     <section id="page-map" class="hidden fade-in space-y-6">
-      
-      <!-- Client Facility Site Comparator Bar -->
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200 pb-4">
           <div>
-            <h2 class="font-display text-2xl font-extrabold text-[#0D2561]">Site Proximity and Drive Time Estimator</h2>
-            <p class="text-sm text-slate-600 mt-1">
-              Enter a client facility address or city below to pinpoint it on the map and automatically calculate <strong class="text-[#0D2561]">estimated driving hours and miles</strong> from every matching vendor partner's HQ.
-            </p>
+            <h2 class="font-display font-extrabold text-xl text-[#0D2561]">Site Proximity and Drive Time Estimator</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Enter a client facility address below to calculate driving hours and mileage from our vendor partners' HQs.</p>
           </div>
-          
-          <!-- Quick Sample Client Test Sites -->
           <div class="flex flex-wrap items-center gap-2">
-            <span class="text-xs font-bold text-slate-500">Quick Test Sites:</span>
-            <button onclick="setQuickClientSite('Orlando, FL 32801', 28.5383, -81.3792, 'FL', 'Orlando')" class="px-2.5 py-1 rounded-lg bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] text-xs font-semibold border border-slate-200 transition">
-              Orlando, FL
+            <button id="btnSwitchMapStyle" onclick="toggleMapBaseLayer()" class="px-3 py-1.5 rounded-lg bg-[#EBF1F8] hover:bg-slate-200 text-[#0D2561] text-xs font-bold border border-slate-200 transition">
+              <i class="fa-solid fa-layer-group text-[#0095D9] mr-1"></i> Street View
             </button>
-            <button onclick="setQuickClientSite('Austin, TX 78701', 30.2672, -97.7431, 'TX', 'Austin')" class="px-2.5 py-1 rounded-lg bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] text-xs font-semibold border border-slate-200 transition">
-              Austin, TX
-            </button>
-            <button onclick="setQuickClientSite('Charlotte, NC 28202', 35.2271, -80.8431, 'NC', 'Charlotte')" class="px-2.5 py-1 rounded-lg bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] text-xs font-semibold border border-slate-200 transition">
-              Charlotte, NC
-            </button>
-            <button onclick="setQuickClientSite('Columbus, OH 43215', 39.9612, -82.9988, 'OH', 'Columbus')" class="px-2.5 py-1 rounded-lg bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] text-xs font-semibold border border-slate-200 transition">
-              Columbus, OH
+            <button onclick="fitMapToPins()" class="px-3 py-1.5 rounded-lg bg-[#0D2561] hover:bg-[#13327A] text-white text-xs font-bold transition">
+              <i class="fa-solid fa-expand text-[#FBC738] mr-1"></i> Fit All Pins
             </button>
           </div>
         </div>
 
-        <!-- Client Site Address Input & Map Filters -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 pt-5">
-          <div class="md:col-span-5">
-            <label class="block text-xs font-bold text-[#0D2561] mb-1">
-              <i class="fa-solid fa-location-crosshairs text-rose-600 mr-1"></i> Client Facility Address / City, State
+        <!-- Client Facility Address Input + Map Filters -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 bg-[#F4F7FB] p-4 rounded-xl border border-slate-200">
+          <div class="lg:col-span-5">
+            <label class="block text-[11px] font-bold text-[#0D2561] mb-1">
+              <i class="fa-solid fa-star text-rose-600 mr-1"></i> Client Facility Site Address
             </label>
             <div class="flex gap-2">
-              <input type="text" id="clientSiteInput" placeholder="e.g. 400 W Church St, Orlando, FL or Dallas, TX" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" onkeydown="if(event.key==='Enter') calculateClientSiteDistances()" />
-              <button id="btnLocateClient" onclick="calculateClientSiteDistances()" class="px-4 py-2 rounded-xl bg-[#0D2561] hover:bg-[#13327A] text-white font-bold text-sm shrink-0 transition flex items-center gap-1.5">
-                <i class="fa-solid fa-route text-[#FBC738]"></i> Compare
+              <input type="text" id="clientSiteInput" placeholder="e.g. Orlando, FL or 500 Biscayne Blvd, Miami, FL" class="flex-1 px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0095D9] outline-none" />
+              <button id="btnLocateClient" onclick="calculateClientSiteDistances()" class="px-3.5 py-2 rounded-lg bg-[#0095D9] hover:bg-[#0284c7] text-white text-xs font-bold shrink-0 transition flex items-center gap-1.5">
+                <i class="fa-solid fa-route"></i> Compare
               </button>
             </div>
           </div>
 
-          <div class="md:col-span-3">
-            <label class="block text-xs font-bold text-slate-600 mb-1">Filter Map by Service</label>
-            <select id="mapFilterService" onchange="refreshMapAndRankings()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-[#0095D9] outline-none">
+          <div class="lg:col-span-3">
+            <label class="block text-[11px] font-bold text-[#0D2561] mb-1">Filter Map by Service</label>
+            <select id="mapFilterService" onchange="refreshMapAndRankings()" class="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0095D9] outline-none">
               <option value="ALL">All 14 Services</option>
             </select>
           </div>
 
-          <div class="md:col-span-2">
-            <label class="block text-xs font-bold text-slate-600 mb-1">Filter by State</label>
-            <select id="mapFilterState" onchange="refreshMapAndRankings()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-[#0095D9] outline-none">
+          <div class="lg:col-span-2">
+            <label class="block text-[11px] font-bold text-[#0D2561] mb-1">Filter State</label>
+            <select id="mapFilterState" onchange="refreshMapAndRankings()" class="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0095D9] outline-none">
               <option value="ALL">All 50 States</option>
             </select>
           </div>
 
-          <div class="md:col-span-2">
-            <label class="block text-xs font-bold text-slate-600 mb-1">Partner Status</label>
-            <select id="mapFilterStatus" onchange="refreshMapAndRankings()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-[#0095D9] outline-none">
+          <div class="lg:col-span-2">
+            <label class="block text-[11px] font-bold text-[#0D2561] mb-1">Status</label>
+            <select id="mapFilterStatus" onchange="refreshMapAndRankings()" class="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0095D9] outline-none">
               <option value="ALL">Active & Leads</option>
               <option value="Active">Active Only</option>
               <option value="Lead">Leads Only</option>
@@ -655,510 +616,534 @@
           </div>
         </div>
 
-        <!-- Active Client Site Status Banner -->
-        <div id="activeClientSiteBanner" class="hidden mt-4 p-3 rounded-xl bg-[#FBC738]/20 border border-[#FBC738] flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
-          <div class="flex items-center gap-2 text-[#0D2561]">
-            <span class="w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center text-xs shrink-0">
-              <i class="fa-solid fa-star"></i>
-            </span>
-            <span>Comparing distances to Client Facility: <strong id="activeClientSiteLabel"></strong></span>
+        <!-- Quick Test Client Facility Pills -->
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-slate-500 font-semibold">Quick Site Test:</span>
+            <button onclick="setQuickClientSite('Orlando, FL', 28.5383, -81.3792, 'FL')" class="px-2.5 py-1 rounded-md bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] font-semibold transition">Orlando, FL</button>
+            <button onclick="setQuickClientSite('Austin, TX', 30.2672, -97.7431, 'TX')" class="px-2.5 py-1 rounded-md bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] font-semibold transition">Austin, TX</button>
+            <button onclick="setQuickClientSite('Charlotte, NC', 35.2271, -80.8431, 'NC')" class="px-2.5 py-1 rounded-md bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] font-semibold transition">Charlotte, NC</button>
+            <button onclick="setQuickClientSite('Indianapolis, IN', 39.7684, -86.1581, 'IN')" class="px-2.5 py-1 rounded-md bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] font-semibold transition">Indianapolis, IN</button>
           </div>
-          <button onclick="clearClientSite()" class="text-[#0D2561] hover:text-rose-700 font-bold underline text-xs">
-            Clear Client Pin
+          <span class="text-slate-500">Showing <strong id="mapFilteredCount" class="text-[#0D2561]">0</strong> pins on map</span>
+        </div>
+
+        <!-- Active Client Site Banner -->
+        <div id="activeClientSiteBanner" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-between gap-2 text-xs">
+          <div class="flex items-center gap-2 text-rose-900">
+            <i class="fa-solid fa-star text-rose-600"></i>
+            <span>Measuring driving hours & distance to: <strong id="activeClientSiteLabel"></strong></span>
+          </div>
+          <button onclick="clearClientSite()" class="px-2.5 py-1 rounded-lg bg-white border border-rose-200 text-rose-700 font-bold hover:bg-rose-100">
+            Clear Site
           </button>
         </div>
       </div>
 
-      <!-- MAP + RANKED PROXIMITY LEADERBOARD GRID -->
+      <!-- Map + Proximity Rankings Split -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <!-- Left 7 Cols: Interactive Leaflet Map -->
-        <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex flex-col">
-          <div class="flex flex-wrap items-center justify-between gap-2 mb-3 px-1">
-            <div class="flex flex-wrap items-center gap-3 text-xs font-semibold text-[#0D2561]">
-              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#0095D9] inline-block"></span> Active Partner HQ</span>
-              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#FBC738] border border-[#0D2561]/30 inline-block"></span> Lead / Vetting HQ</span>
-              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-600 inline-block"></span> Client Facility Site</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <button onclick="toggleMapBaseLayer()" id="btnSwitchMapStyle" class="text-xs font-bold text-[#0D2561] hover:text-[#0095D9] bg-[#EBF1F8] px-2.5 py-1 rounded-lg border border-slate-200 transition">
-                <i class="fa-solid fa-layer-group text-[#0095D9] mr-1"></i> Street View
-              </button>
-              <button onclick="fitMapToPins()" class="text-xs font-bold text-[#0095D9] hover:underline">
-                <i class="fa-solid fa-expand"></i> Reset Zoom
-              </button>
-            </div>
-          </div>
-          
-          <div id="vendorMap" class="border border-slate-200"></div>
+        <div class="lg:col-span-7 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
+          <div id="vendorMap"></div>
         </div>
 
-        <!-- Right 5 Cols: Ranked Drive-Time Leaderboard -->
-        <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col max-h-[615px]">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-            <div>
-              <h3 class="font-display font-extrabold text-base text-[#0D2561]" id="mapSidebarTitle">
-                Vendor Locations & Coverage
-              </h3>
-              <p class="text-xs text-slate-500" id="mapSidebarSubtitle">
-                Enter a client site above to rank vendors by driving hours.
-              </p>
-            </div>
-            <span id="mapFilteredCount" class="px-2.5 py-1 rounded-full bg-[#0D2561] text-[#FBC738] text-xs font-bold">0</span>
+        <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col max-h-[566px]">
+          <div class="border-b border-slate-200 pb-3 mb-3">
+            <h3 id="mapSidebarTitle" class="font-display font-extrabold text-base text-[#0D2561]">Vendor Locations & Coverage</h3>
+            <p id="mapSidebarSubtitle" class="text-xs text-slate-500 mt-0.5">Enter a client facility address above to measure drive time.</p>
           </div>
-
-          <div id="mapProximityList" class="overflow-y-auto flex-grow divide-y divide-slate-100 pr-1 mt-2 space-y-2">
-            <!-- Ranked cards populated here -->
-          </div>
+          <div id="mapProximityList" class="space-y-3 overflow-y-auto pr-1 flex-1"></div>
         </div>
-
       </div>
     </section>
 
-
     <!-- ===================================================================== -->
-    <!-- PAGE 4: DELETED LEADS & ARCHIVE AUDIT LOG                             -->
+    <!-- PAGE 4: DELETED LEADS & ARCHIVE LOG                                   -->
     <!-- ===================================================================== -->
     <section id="page-deleted" class="hidden fade-in space-y-6">
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
           <div>
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-xs font-bold mb-1">
-              <i class="fa-solid fa-shield-halved"></i> Full Deletion & Audit Trail
-            </div>
-            <h2 class="font-display text-2xl font-extrabold text-[#0D2561]">Deleted Leads & Vendor Archive Log</h2>
-            <p class="text-sm text-slate-600 mt-1">
-              Every removed lead or vendor is safely archived here with the exact <strong class="text-[#0D2561]">team member name, timestamp, deletion reason, and comment history</strong>. Restore any record back to the active directory with 1 click.
-            </p>
+            <h2 class="font-display font-extrabold text-xl text-[#0D2561]">Deleted Leads & Archive Log</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Audit trail of all deleted vendors and leads, including who deleted them, when, why, and 1-click restoration.</p>
           </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <div class="relative">
-              <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs absolute left-3 top-1/2 -translate-y-1/2"></i>
-              <input type="text" id="deletedSearchInput" oninput="renderDeletedPage()" placeholder="Search deleted records or user..." class="pl-8 pr-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
-            </div>
+          <div class="w-full sm:w-72">
+            <input type="text" id="deletedSearchInput" oninput="renderDeletedPage()" placeholder="Search deleted company, user, reason..." class="w-full px-3 py-2 text-xs bg-[#F4F7FB] border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
           </div>
         </div>
 
-        <!-- Empty Deleted Archive State -->
         <div id="deletedEmptyState" class="py-12 text-center space-y-2">
-          <div class="w-12 h-12 rounded-full bg-[#EBF1F8] text-[#0095D9] flex items-center justify-center mx-auto text-xl">
+          <div class="w-12 h-12 rounded-full bg-[#EBF1F8] text-[#0D2561] flex items-center justify-center mx-auto text-lg">
             <i class="fa-solid fa-box-archive"></i>
           </div>
-          <h3 class="font-display font-bold text-base text-[#0D2561]">No deleted leads or vendors in the archive</h3>
-          <p class="text-xs text-slate-500 max-w-md mx-auto">
-            Whenever anyone removes a vendor or lead from the directory, it will automatically appear here showing who deleted it and when.
-          </p>
+          <h3 class="font-display font-bold text-base text-[#0D2561]">No deleted leads in the archive</h3>
+          <p class="text-xs text-slate-500">Whenever a team member deletes a lead or vendor from the directory, it is safely logged here with full audit details.</p>
         </div>
 
-        <!-- Deleted Records Cards Container -->
-        <div id="deletedCardsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Populated dynamically -->
-        </div>
+        <div id="deletedCardsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
       </div>
     </section>
 
   </main>
 
   <!-- FOOTER -->
-  <footer class="bg-white border-t border-slate-200 mt-12 py-5">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
-      <div>
-        <strong class="text-[#0D2561]">Agile Facility Solutions - Vendor Partners</strong> &bull; Internal Operations & Dispatch Portal
-      </div>
-      <div>
-        Prepared and maintained by <strong class="text-[#0095D9]">Jowie Corrado, Vendor Coordinator</strong>
-      </div>
+  <footer class="bg-[#0D2561] text-slate-300 text-xs py-4 px-4 mt-10 border-t border-[#0095D9]/30">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <span><strong>Agile Facility Solutions - Vendor Partners</strong> &bull; Prepared and maintained by <strong class="text-[#FBC738]">Jowie Corrado</strong>, Vendor Coordinator</span>
+      <button onclick="resetToSampleData()" class="text-slate-400 hover:text-white underline">Reset Sample Data</button>
     </div>
   </footer>
 
-
   <!-- ===================================================================== -->
-  <!-- ADD / EDIT VENDOR & LEAD MODAL                                        -->
+  <!-- MODAL 1: ADD / EDIT VENDOR PARTNER OR LEAD                            -->
   <!-- ===================================================================== -->
   <div id="vendorModal" class="hidden fixed inset-0 z-50 bg-[#081842]/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl my-8 overflow-hidden fade-in">
-      
-      <!-- Modal Header -->
-      <div class="bg-[#0D2561] text-white px-6 py-4 flex items-center justify-between border-b border-[#0095D9]/30">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+      <div class="bg-[#0D2561] text-white px-6 py-4 flex items-center justify-between">
         <div>
           <h3 id="modalTitle" class="font-display font-extrabold text-lg">Add New Vendor Partner / Lead</h3>
-          <p class="text-xs text-slate-200">Log company details, decision-maker contact, coverage states/cities, and service capabilities.</p>
+          <p id="modalAuditSummary" class="text-xs text-slate-300 mt-0.5">New record</p>
         </div>
-        <button onclick="closeVendorModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition">
+        <button type="button" onclick="closeVendorModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <!-- Modal Form -->
-      <form id="vendorForm" onsubmit="saveVendorForm(event)" class="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
+      <form id="vendorForm" onsubmit="saveVendorForm(event)" class="p-6 overflow-y-auto space-y-5 flex-1">
         <input type="hidden" id="vendorId" />
 
-        <!-- Row 1: Status & Company Name -->
+        <!-- Mandatory Team Member Attribution Bar -->
+        <div class="p-3.5 rounded-xl bg-[#FBC738]/20 border border-[#FBC738] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="text-xs text-[#0D2561]">
+            <strong><i class="fa-solid fa-user-check mr-1"></i> Who is saving this record?</strong>
+            <p class="text-[11px] text-slate-600">Required to log Created By / Updated By audit history.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="modalActionActorSelect" class="px-3 py-1.5 text-xs font-bold text-[#0D2561] bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0095D9] outline-none"></select>
+            <button type="button" onclick="openTeamRosterModal()" class="px-2.5 py-1.5 rounded-lg bg-[#0D2561] text-white text-xs font-bold whitespace-nowrap">+ Member</button>
+          </div>
+        </div>
+
+        <!-- Company & Status -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-[#0D2561] mb-1">Company Name *</label>
+            <input type="text" id="formCompany" required placeholder="e.g. Gulf Coast Total Facility Services" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
+          </div>
           <div>
             <label class="block text-xs font-bold text-[#0D2561] mb-1">Partner Status *</label>
-            <select id="formStatus" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-[#0095D9] outline-none">
+            <select id="formStatus" class="w-full px-3 py-2 text-xs font-bold border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none">
               <option value="Active">Active Vendor Partner</option>
               <option value="Lead">Lead / In Vetting</option>
             </select>
           </div>
-          <div class="sm:col-span-2">
-            <label class="block text-xs font-bold text-[#0D2561] mb-1">Company Name *</label>
-            <input type="text" id="formCompany" required placeholder="e.g. Sunshine State Facility Pros LLC" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
-          </div>
         </div>
 
-        <!-- Row 2: Representative Name & Position -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Representative & Contact -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div>
             <label class="block text-xs font-bold text-[#0D2561] mb-1">Representative Name *</label>
-            <input type="text" id="formRepName" required placeholder="e.g. Carlos Mendoza" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
+            <input type="text" id="formRepName" required placeholder="e.g. Carlos Mendoza" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
           </div>
           <div>
             <label class="block text-xs font-bold text-[#0D2561] mb-1">Position / Role *</label>
-            <select id="formPosition" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-[#0095D9] outline-none">
+            <select id="formPosition" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none">
               <option value="CEO">CEO</option>
               <option value="Business Owner">Business Owner</option>
               <option value="Admin Representative">Admin Representative</option>
               <option value="Operations Manager">Operations Manager</option>
               <option value="Account Executive">Account Executive</option>
-              <option value="Regional Director">Regional Director</option>
             </select>
           </div>
-        </div>
-
-        <!-- Row 3: Email & Phone -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-bold text-[#0D2561] mb-1">Email Address *</label>
-            <input type="email" id="formEmail" required placeholder="contact@vendorcompany.com" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
+            <input type="email" id="formEmail" required placeholder="name@company.com" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
           </div>
           <div>
             <label class="block text-xs font-bold text-[#0D2561] mb-1">Phone Number *</label>
-            <input type="text" id="formPhone" required placeholder="(813) 555-0194" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
+            <input type="text" id="formPhone" required placeholder="(813) 555-0194" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
           </div>
         </div>
 
-        <!-- Row 4: Company HQ Location (Used for Map & Drive Time) -->
-        <div class="p-4 rounded-xl bg-[#F4F7FB] border border-slate-200 space-y-3">
-          <div class="flex items-center justify-between">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-[#0D2561]">
-              <i class="fa-solid fa-building text-[#0095D9] mr-1"></i> Company HQ Address (For Map & Drive-Time Distance)
-            </h4>
+        <!-- HQ Location -->
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-[#0D2561] mb-1">HQ Street Address (Optional)</label>
+            <input type="text" id="formStreet" placeholder="4820 W Kennedy Blvd" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-            <div class="sm:col-span-2">
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Street Address</label>
-              <input type="text" id="formStreet" placeholder="e.g. 1200 N Dale Mabry Hwy" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-[#0095D9]" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">HQ City *</label>
-              <input type="text" id="formHqCity" required placeholder="e.g. Tampa" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-[#0095D9]" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">HQ State *</label>
-              <select id="formHqState" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-[#0095D9]">
-                <!-- Populated by JS -->
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- Row 5: Service Coverage Areas (Multiple States + Statewide Toggle + Multiple Cities) -->
-        <div class="p-4 rounded-xl bg-[#0095D9]/10 border border-[#0095D9]/30 space-y-3">
           <div>
-            <h4 class="text-xs font-bold uppercase tracking-wider text-[#0D2561]">
-              <i class="fa-solid fa-map-location-dot text-[#0095D9] mr-1"></i> Confirmed Service Coverage Areas
-            </h4>
-            <p class="text-xs text-slate-600 mt-0.5">
-              Does this vendor service their whole state or multiple states? Add all states and specific cities they cover.
-            </p>
+            <label class="block text-xs font-bold text-[#0D2561] mb-1">HQ City *</label>
+            <input type="text" id="formHqCity" required placeholder="Tampa" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
           </div>
-
-          <!-- Add Coverage State -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-[#0D2561] mb-1">Add Covered State(s)</label>
-              <div class="flex gap-2">
-                <select id="coverageStatePicker" class="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-lg bg-white outline-none">
-                  <!-- Populated by JS -->
-                </select>
-                <button type="button" onclick="addCoverageStateTag()" class="px-3 py-1.5 rounded-lg bg-[#0095D9] hover:bg-[#0284c7] text-white text-xs font-bold shrink-0">
-                  + State
-                </button>
-              </div>
-              <label class="inline-flex items-center gap-2 mt-2 cursor-pointer text-xs font-semibold text-[#0D2561]">
-                <input type="checkbox" id="formStatewide" class="rounded text-[#0095D9] focus:ring-[#0095D9]" />
-                <span>Covers Entire State(s) Statewide (e.g., Whole State of Florida)</span>
-              </label>
-            </div>
-
-            <!-- Add Specific Coverage Cities -->
-            <div>
-              <label class="block text-xs font-bold text-[#0D2561] mb-1">Add Specific Service Cities / Metros</label>
-              <div class="flex gap-2">
-                <input type="text" id="coverageCityInput" placeholder="e.g. Orlando, FL or Miami" class="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-lg bg-white outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault(); addCoverageCityTag();}" />
-                <button type="button" onclick="addCoverageCityTag()" class="px-3 py-1.5 rounded-lg bg-[#0D2561] hover:bg-[#13327A] text-white text-xs font-bold shrink-0">
-                  + City
-                </button>
-              </div>
-              <p class="text-[11px] text-slate-500 mt-1.5">Press Enter or click + City to add multiple cities.</p>
-            </div>
-          </div>
-
-          <!-- Selected Coverage Tags Display -->
-          <div class="flex flex-wrap gap-1.5 pt-1" id="selectedCoverageTags">
-            <!-- Tags rendered here -->
+          <div>
+            <label class="block text-xs font-bold text-[#0D2561] mb-1">HQ State *</label>
+            <select id="formHqState" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none"></select>
           </div>
         </div>
 
-        <!-- Row 6: 14 Service Capabilities Checkboxes -->
-        <div>
-          <div class="flex items-center justify-between mb-2">
-            <label class="block text-xs font-bold uppercase tracking-wider text-[#0D2561]">
-              Service Capabilities (Select all that apply) *
-            </label>
-            <span class="text-xs font-bold text-[#0095D9]" id="selectedServiceCount">0 selected</span>
-          </div>
-          <div id="formServicesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3.5 rounded-xl border border-slate-200 bg-[#F4F7FB] max-h-56 overflow-y-auto">
-            <!-- 14 checkboxes populated by JS -->
-          </div>
-        </div>
-
-        <!-- Row 7: Notes & Vetting Info -->
-        <div>
-          <label class="block text-xs font-bold text-[#0D2561] mb-1">Coordinator Summary Notes (COI, W-9, Dispatch Hours, Pricing Tier)</label>
-          <textarea id="formNotes" rows="2" placeholder="e.g. COI & W-9 verified. Services all of Florida with 24/7 emergency dispatch." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none"></textarea>
-        </div>
-
-        <!-- Row 8: Audit Trail & Team Comments Section -->
+        <!-- Service Coverage Areas (Multi-State + Statewide + Multi-City) -->
         <div class="p-4 rounded-xl bg-[#F4F7FB] border border-slate-200 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-[#0D2561]">
-              <i class="fa-solid fa-clock-rotate-left text-[#0095D9] mr-1"></i> Audit Trail & Team Comments
-            </h4>
-            <span id="modalAuditSummary" class="text-[11px] font-semibold text-slate-500"></span>
+            <label class="text-xs font-extrabold text-[#0D2561]">Confirmed Service Coverage Areas</label>
+            <label class="inline-flex items-center gap-2 text-xs font-bold text-[#0095D9] cursor-pointer">
+              <input type="checkbox" id="formStatewide" class="rounded text-[#0095D9]" />
+              <span>Provides Statewide Coverage (Entire State)</span>
+            </label>
           </div>
 
-          <!-- Mandatory Team Member Attribution Selector inside Modal -->
-          <div class="p-2.5 rounded-lg bg-white border border-[#0095D9]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <label for="modalActionActorSelect" class="text-xs font-bold text-[#0D2561] flex items-center gap-1.5">
-              <i class="fa-solid fa-user-pen text-[#0095D9]"></i>
-              <span>Who is creating / updating this record? *</span>
-            </label>
-            <div class="flex items-center gap-1.5">
-              <select id="modalActionActorSelect" required class="px-2.5 py-1.5 text-xs font-bold text-[#0D2561] border border-slate-300 rounded-lg bg-[#F4F7FB] focus:ring-2 focus:ring-[#0095D9] outline-none">
-                <!-- Populated with Team Roster + Select Prompt -->
-              </select>
-              <button type="button" onclick="openTeamRosterModal()" class="px-2 py-1.5 rounded-lg bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] text-[11px] font-bold transition" title="Add Team Member">
-                + Member
-              </button>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Add Covered States</label>
+              <div class="flex gap-1.5">
+                <select id="coverageStatePicker" class="flex-1 px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-lg"></select>
+                <button type="button" onclick="addCoverageStateTag()" class="px-3 py-1.5 rounded-lg bg-[#0D2561] text-white text-xs font-bold">+ State</button>
+              </div>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Add Specific Cities / Metros</label>
+              <div class="flex gap-1.5">
+                <input type="text" id="coverageCityInput" placeholder="e.g. Orlando, FL" class="flex-1 px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-lg" />
+                <button type="button" onclick="addCoverageCityTag()" class="px-3 py-1.5 rounded-lg bg-[#0095D9] text-white text-xs font-bold">+ City</button>
+              </div>
             </div>
           </div>
 
-          <!-- Add New Comment Inside Modal -->
-          <div class="flex gap-2">
-            <input type="text" id="modalNewCommentInput" placeholder="Add a follow-up comment or status note as current user..." class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-[#0095D9]" onkeydown="if(event.key==='Enter'){event.preventDefault(); addCommentInModal();}" />
-            <button type="button" onclick="addCommentInModal()" class="px-3 py-1.5 rounded-lg bg-[#0095D9] hover:bg-[#0284c7] text-white text-xs font-bold shrink-0">
-              + Comment
-            </button>
-          </div>
+          <div id="selectedCoverageTags" class="flex flex-wrap gap-1.5 pt-1"></div>
+        </div>
 
-          <!-- Existing Comments List in Modal -->
-          <div id="modalCommentsList" class="space-y-1.5 max-h-36 overflow-y-auto">
-            <!-- Populated dynamically -->
+        <!-- 14 Service Capabilities Checkboxes -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-xs font-extrabold text-[#0D2561]">Service Capabilities (Select all that apply) *</label>
+            <span id="selectedServiceCount" class="text-xs font-bold text-[#0095D9]">0 selected</span>
+          </div>
+          <div id="formServicesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 rounded-xl bg-[#F4F7FB] border border-slate-200"></div>
+        </div>
+
+        <!-- Notes & Inline Comments -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-[#0D2561] mb-1">Coordinator Notes (W-9, COI, Rates)</label>
+            <textarea id="formNotes" rows="3" placeholder="e.g. COI & W-9 verified, 24/7 dispatch..." class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none"></textarea>
+          </div>
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-[#0D2561]">Team Activity Comments</label>
+            <div id="modalCommentsList" class="max-h-20 overflow-y-auto space-y-1.5 p-2 rounded-xl bg-[#F4F7FB] border border-slate-200"></div>
+            <div class="flex gap-1.5">
+              <input type="text" id="modalNewCommentInput" placeholder="Add follow-up note..." class="flex-1 px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg" />
+              <button type="button" onclick="addCommentInModal()" class="px-2.5 py-1.5 rounded-lg bg-[#0095D9] text-white text-xs font-bold">+ Comment</button>
+            </div>
           </div>
         </div>
 
-        <!-- Modal Footer Actions -->
-        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
-          <button type="button" onclick="closeVendorModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-50">
-            Cancel
-          </button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-[#0D2561] hover:bg-[#13327A] text-white font-bold text-sm shadow-md flex items-center gap-2">
-            <i class="fa-solid fa-floppy-disk text-[#FBC738]"></i> Save Vendor Partner
-          </button>
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
+          <button type="button" onclick="closeVendorModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-[#0D2561] hover:bg-[#13327A] text-white text-xs font-extrabold shadow">Save Vendor / Lead</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- DELETE REASON & AUDIT CONFIRMATION MODAL -->
-  <div id="deleteReasonModal" class="hidden fixed inset-0 z-50 bg-[#081842]/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden fade-in">
-      <div class="bg-rose-700 text-white px-5 py-3.5 flex items-center justify-between">
-        <h3 class="font-display font-extrabold text-base flex items-center gap-2">
-          <i class="fa-solid fa-trash-can"></i> Archive & Delete Record
-        </h3>
-        <button onclick="closeDeleteModal()" class="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/25 text-white flex items-center justify-center">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-      <div class="p-5 space-y-4">
-        <input type="hidden" id="deleteTargetVendorId" />
-        <p class="text-xs text-slate-600 leading-relaxed">
-          You are moving <strong id="deleteTargetCompanyName" class="text-[#0D2561]"></strong> to the <strong>Deleted Leads & Archive Log</strong>. Select your name below to log this action.
-        </p>
-        <div>
-          <label class="block text-xs font-bold text-[#0D2561] mb-1">Who is deleting this record? *</label>
-          <select id="deleteActorSelect" class="w-full px-3 py-2 text-xs font-bold text-[#0D2561] border border-slate-300 rounded-xl bg-[#F4F7FB] focus:ring-2 focus:ring-rose-500 outline-none">
-            <!-- Populated with Team Roster -->
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-[#0D2561] mb-1">Reason for Deletion / Archiving (Optional)</label>
-          <input type="text" id="deleteReasonInput" placeholder="e.g. Duplicate lead, unresponsive, outside service area..." class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault(); confirmDeleteVendor();}" />
-        </div>
-        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-          <button type="button" onclick="closeDeleteModal()" class="px-3.5 py-2 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50">
-            Cancel
-          </button>
-          <button type="button" onclick="confirmDeleteVendor()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow">
-            Confirm & Move to Archive
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- QUICK COMMENT THREAD DRAWER / MODAL FOR ANY VENDOR OR LEAD -->
-  <div id="commentThreadModal" class="hidden fixed inset-0 z-50 bg-[#081842]/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden fade-in">
-      <div class="bg-[#0D2561] text-white px-5 py-3.5 flex items-center justify-between border-b border-[#0095D9]/30">
-        <div>
-          <h3 id="commentModalCompany" class="font-display font-extrabold text-base">Activity & Team Comments</h3>
-          <p id="commentModalAuditMeta" class="text-[11px] text-slate-300 mt-0.5"></p>
-        </div>
-        <button onclick="closeCommentThreadModal()" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-      <div class="p-5 space-y-4">
-        <input type="hidden" id="commentThreadVendorId" />
-        
-        <!-- Comment Author Selector -->
-        <div class="flex items-center justify-between gap-2 bg-[#F4F7FB] p-2.5 rounded-xl border border-slate-200">
-          <label for="commentActorSelect" class="text-xs font-bold text-[#0D2561]">Posting as: *</label>
-          <select id="commentActorSelect" class="px-2.5 py-1 text-xs font-bold text-[#0D2561] border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-[#0095D9] outline-none">
-            <!-- Populated with Team Roster -->
-          </select>
-        </div>
-
-        <!-- Quick Follow-Up Automation Pills -->
-        <div>
-          <span class="block text-[11px] font-bold text-slate-500 mb-1.5">1-Click Quick Status Comment:</span>
-          <div class="flex flex-wrap gap-1.5">
-            <button type="button" onclick="insertQuickComment('Called & left voicemail for pricing/COI.')" class="px-2.5 py-1 rounded-lg bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] text-[11px] font-semibold transition">
-              + Left Voicemail
-            </button>
-            <button type="button" onclick="insertQuickComment('Sent onboarding packet (W-9 & COI request).')" class="px-2.5 py-1 rounded-lg bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] text-[11px] font-semibold transition">
-              + Sent W-9 / COI
-            </button>
-            <button type="button" onclick="insertQuickComment('Confirmed service coverage & dispatch rates.')" class="px-2.5 py-1 rounded-lg bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] text-[11px] font-semibold transition">
-              + Coverage Confirmed
-            </button>
-          </div>
-        </div>
-
-        <!-- Comments Feed -->
-        <div id="commentThreadList" class="space-y-2 max-h-64 overflow-y-auto p-3 rounded-xl bg-[#F4F7FB] border border-slate-200">
-          <!-- Populated dynamically -->
-        </div>
-
-        <!-- Post Comment Form -->
-        <form onsubmit="submitThreadComment(event)" class="flex gap-2">
-          <input type="text" id="threadCommentInput" required placeholder="Write an update or comment..." class="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
-          <button type="submit" class="px-4 py-2 rounded-xl bg-[#0D2561] hover:bg-[#13327A] text-white font-bold text-xs shrink-0 flex items-center gap-1.5">
-            <i class="fa-solid fa-paper-plane text-[#FBC738]"></i> Post
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- TEAM ROSTER MANAGEMENT MODAL -->
+  <!-- ===================================================================== -->
+  <!-- MODAL 2: TEAM ROSTER MANAGER                                          -->
+  <!-- ===================================================================== -->
   <div id="teamRosterModal" class="hidden fixed inset-0 z-50 bg-[#081842]/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden fade-in">
-      <div class="bg-[#0D2561] text-white px-5 py-3.5 flex items-center justify-between border-b border-[#0095D9]/30">
-        <div>
-          <h3 class="font-display font-extrabold text-base flex items-center gap-2">
-            <i class="fa-solid fa-users-gear text-[#FBC738]"></i> Manage Team Members
-          </h3>
-          <p class="text-[11px] text-slate-300 mt-0.5">Add colleagues who can create, update, comment, or archive leads.</p>
-        </div>
-        <button onclick="closeTeamRosterModal()" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full overflow-hidden">
+      <div class="bg-[#0D2561] text-white px-5 py-3.5 flex items-center justify-between">
+        <h3 class="font-display font-extrabold text-base">Agile Facility Solutions Team Roster</h3>
+        <button type="button" onclick="closeTeamRosterModal()" class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="p-5 space-y-4">
-        <form onsubmit="addTeamMemberFromModal(event)" class="flex gap-2">
-          <input type="text" id="newTeamMemberName" required placeholder="Full Name (e.g. Sarah Jenkins)" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
-          <input type="text" id="newTeamMemberRole" placeholder="Role (Optional)" class="w-32 px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0095D9] outline-none" />
-          <button type="submit" class="px-3.5 py-2 rounded-xl bg-[#0095D9] hover:bg-[#0284c7] text-white font-bold text-xs shrink-0">
-            + Add
-          </button>
+        <p class="text-xs text-slate-600">Add or select your team members below so every update, lead, comment, and deletion is properly credited.</p>
+        <form onsubmit="addTeamMemberFromModal(event)" class="grid grid-cols-1 sm:grid-cols-5 gap-2">
+          <input type="text" id="newTeamMemberName" required placeholder="Full Name" class="sm:col-span-2 px-3 py-2 text-xs border border-slate-300 rounded-lg" />
+          <input type="text" id="newTeamMemberRole" placeholder="Role (e.g. Ops)" class="sm:col-span-2 px-3 py-2 text-xs border border-slate-300 rounded-lg" />
+          <button type="submit" class="px-3 py-2 rounded-lg bg-[#0095D9] text-white text-xs font-bold">+ Add</button>
         </form>
-
-        <div class="space-y-1.5 max-h-60 overflow-y-auto" id="teamRosterList">
-          <!-- Populated dynamically -->
-        </div>
-
-        <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-          <span>Tip: Export a JSON backup after adding your team!</span>
-          <button type="button" onclick="closeTeamRosterModal()" class="px-4 py-1.5 rounded-xl bg-[#0D2561] text-white font-bold text-xs">
-            Done
-          </button>
-        </div>
+        <div id="teamRosterList" class="space-y-2 max-h-60 overflow-y-auto"></div>
       </div>
     </div>
   </div>
 
-  <!-- MANDATORY IDENTITY GATE MODAL (TRIGGERED BEFORE QUICK ACTIONS OR FIRST VISIT) -->
-  <div id="identityPromptModal" class="hidden fixed inset-0 z-50 bg-[#081842]/75 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden fade-in">
-      <div class="bg-[#0D2561] text-white px-5 py-4 border-b border-[#0095D9]/30">
-        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FBC738]/20 text-[#FBC738] text-[10px] font-bold mb-1">
-          <i class="fa-solid fa-user-shield"></i> Required Team Attribution
+  <!-- ===================================================================== -->
+  <!-- MODAL 3: MANDATORY IDENTITY ATTRIBUTION GATE                          -->
+  <!-- ===================================================================== -->
+  <div id="identityPromptModal" class="hidden fixed inset-0 z-50 bg-[#081842]/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-sm w-full p-5 space-y-4">
+      <div class="flex items-center gap-2.5 text-[#0D2561]">
+        <div class="w-9 h-9 rounded-xl bg-[#FBC738]/30 flex items-center justify-center text-base">
+          <i class="fa-solid fa-user-check"></i>
         </div>
-        <h3 class="font-display font-extrabold text-lg">Who is making this update?</h3>
-        <p id="identityPromptSubtitle" class="text-xs text-slate-200 mt-0.5">Select your name from our team roster before proceeding.</p>
-      </div>
-      <div class="p-5 space-y-4">
         <div>
-          <label class="block text-xs font-bold text-[#0D2561] mb-1">Select Team Member *</label>
-          <select id="identityGateSelect" class="w-full px-3.5 py-2.5 text-sm font-bold text-[#0D2561] border border-slate-300 rounded-xl bg-[#F4F7FB] focus:ring-2 focus:ring-[#0095D9] outline-none">
-            <!-- Populated with Team Roster -->
-          </select>
+          <h3 class="font-display font-extrabold text-base">Confirm Team Member</h3>
+          <p id="identityPromptSubtitle" class="text-xs text-slate-500">Select your name to log this action.</p>
         </div>
-        <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
-          <button type="button" onclick="openTeamRosterModal()" class="text-xs font-bold text-[#0095D9] hover:underline">
-            + Add New Team Member
-          </button>
-          <div class="flex items-center gap-2">
-            <button type="button" onclick="closeIdentityGate()" class="px-3.5 py-2 rounded-xl border border-slate-300 text-slate-600 font-semibold text-xs hover:bg-slate-50">
-              Cancel
-            </button>
-            <button type="button" onclick="confirmIdentityGate()" class="px-4 py-2 rounded-xl bg-[#0D2561] hover:bg-[#13327A] text-white font-bold text-xs shadow">
-              Continue & Save
-            </button>
-          </div>
+      </div>
+      <select id="identityGateSelect" class="w-full px-3 py-2 text-xs font-bold text-[#0D2561] border border-slate-300 rounded-xl"></select>
+      <div class="flex items-center justify-between gap-2 pt-1">
+        <button type="button" onclick="openTeamRosterModal()" class="text-xs font-bold text-[#0095D9] hover:underline">+ Add My Name</button>
+        <div class="flex gap-2">
+          <button type="button" onclick="closeIdentityGate()" class="px-3 py-1.5 rounded-lg bg-slate-100 text-xs font-bold text-slate-600">Cancel</button>
+          <button type="button" onclick="confirmIdentityGate()" class="px-4 py-1.5 rounded-lg bg-[#0D2561] text-white text-xs font-bold">Continue</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION BANNER -->
-  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 hidden transform transition-all duration-300">
-    <div class="bg-[#0D2561] text-white px-4 py-3 rounded-xl shadow-xl border border-[#0095D9]/40 flex items-center gap-2.5 text-sm font-medium">
-      <i id="toastIcon" class="fa-solid fa-circle-check text-[#FBC738]"></i>
-      <span id="toastMessage">Saved!</span>
+  <!-- ===================================================================== -->
+  <!-- MODAL 4: TEAM COMMENTS THREAD                                         -->
+  <!-- ===================================================================== -->
+  <div id="commentThreadModal" class="hidden fixed inset-0 z-50 bg-[#081842]/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden">
+      <div class="bg-[#0D2561] text-white px-5 py-3.5 flex items-center justify-between">
+        <div>
+          <h3 id="commentModalCompany" class="font-display font-extrabold text-base">Team Comments</h3>
+          <p id="commentModalAuditMeta" class="text-[11px] text-slate-300"></p>
+        </div>
+        <button type="button" onclick="closeCommentThreadModal()" class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-5 space-y-3">
+        <div id="commentThreadList" class="space-y-2 max-h-56 overflow-y-auto p-3 rounded-xl bg-[#F4F7FB] border border-slate-200"></div>
+        <div class="flex flex-wrap gap-1.5">
+          <button type="button" onclick="insertQuickComment('Left voicemail with representative.')" class="px-2 py-1 rounded bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] text-[11px] font-semibold transition">+ Left Voicemail</button>
+          <button type="button" onclick="insertQuickComment('Sent W-9 & COI onboarding packet.')" class="px-2 py-1 rounded bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] text-[11px] font-semibold transition">+ Sent W-9 / COI</button>
+          <button type="button" onclick="insertQuickComment('Confirmed service areas and emergency dispatch rates.')" class="px-2 py-1 rounded bg-[#EBF1F8] hover:bg-[#0095D9] hover:text-white text-[#0D2561] text-[11px] font-semibold transition">+ Coverage Confirmed</button>
+        </div>
+        <form onsubmit="submitThreadComment(event)" class="space-y-2 pt-2 border-t border-slate-200">
+          <input type="hidden" id="commentThreadVendorId" />
+          <div class="flex items-center gap-2">
+            <label class="text-xs font-bold text-[#0D2561] shrink-0">Posting as:</label>
+            <select id="commentActorSelect" class="flex-1 px-2.5 py-1.5 text-xs font-bold border border-slate-300 rounded-lg"></select>
+          </div>
+          <div class="flex gap-2">
+            <input type="text" id="threadCommentInput" required placeholder="Write an update for the team..." class="flex-1 px-3 py-2 text-xs border border-slate-300 rounded-xl" />
+            <button type="submit" class="px-4 py-2 rounded-xl bg-[#0095D9] text-white text-xs font-bold">Post</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
+  <!-- ===================================================================== -->
+  <!-- MODAL 5: DELETE / ARCHIVE CONFIRMATION                                -->
+  <!-- ===================================================================== -->
+  <div id="deleteReasonModal" class="hidden fixed inset-0 z-50 bg-[#081842]/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full p-5 space-y-4">
+      <div class="flex items-center gap-3 text-rose-700">
+        <div class="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center text-lg">
+          <i class="fa-solid fa-trash-can"></i>
+        </div>
+        <div>
+          <h3 class="font-display font-extrabold text-base text-[#0D2561]">Archive & Delete Record</h3>
+          <p class="text-xs text-slate-600">Moving <strong id="deleteTargetCompanyName"></strong> to Deleted Leads Log.</p>
+        </div>
+      </div>
+      <input type="hidden" id="deleteTargetVendorId" />
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-[#0D2561] mb-1">Deleted By (Team Member) *</label>
+          <select id="deleteActorSelect" class="w-full px-3 py-2 text-xs font-bold border border-slate-300 rounded-xl"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#0D2561] mb-1">Reason for Deletion (Optional)</label>
+          <input type="text" id="deleteReasonInput" placeholder="e.g. Duplicate entry, out of service area..." class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl" />
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-xs font-bold text-slate-700">Cancel</button>
+        <button type="button" onclick="confirmDeleteVendor()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold">Move to Deleted Archive</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastNotification" class="hidden fixed bottom-5 right-5 z-50 bg-[#0D2561] text-white px-4 py-3 rounded-xl shadow-xl border border-[#0095D9]/40 flex items-center gap-2.5 text-xs font-semibold">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-teal-400"></i>
+    <span id="toastMessage">Saved!</span>
+  </div>
 
   <!-- ===================================================================== -->
-  <!-- JAVASCRIPT APPLICATION LOGIC                                          -->
+  <!-- JAVASCRIPT APPLICATION LOGIC (WITH REAL-TIME CLOUD SYNC)              -->
   <!-- ===================================================================== -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // =========================================================================
+    // GITHUB PAGES LIVE CLOUD SYNC SETUP (PASTE YOUR FREE FIREBASE CONFIG HERE)
+    // =========================================================================
+    const EXTERNAL_CLOUD_CONFIG = {
+      apiKey: "AIzaSyA6AJNKfRWmvIAlbTLCZA6ToVre4GjRXD8",
+      authDomain: "agile-vendor-hub.firebaseapp.com",
+      projectId: "agile-vendor-hub",
+      storageBucket: "agile-vendor-hub.firebasestorage.app",
+      messagingSenderId: "726089281194",
+      appId: "1:726089281194:web:cbfa1e943e88f2811a2ad3"
+    };
+
+    window.CloudSync = {
+      enabled: false,
+      ready: false,
+      db: null,
+      auth: null,
+      user: null,
+      appId: typeof __app_id !== "undefined" ? __app_id : "agile-facility-vendor-hub",
+
+      async init(onRemoteUpdateCallback) {
+        try {
+          const hasExternalConfig = EXTERNAL_CLOUD_CONFIG && EXTERNAL_CLOUD_CONFIG.apiKey && EXTERNAL_CLOUD_CONFIG.projectId;
+          const hasWorkspaceConfig = typeof __firebase_config !== "undefined" && __firebase_config;
+
+          if (!hasWorkspaceConfig && !hasExternalConfig) {
+            this.updateBadge("Local Mode (Export JSON to share)", "bg-amber-500/20 text-amber-200 border-amber-400/40", "bg-amber-400");
+            return false;
+          }
+
+          const firebaseConfig = hasWorkspaceConfig
+            ? (typeof __firebase_config === "string" ? JSON.parse(__firebase_config) : __firebase_config)
+            : EXTERNAL_CLOUD_CONFIG;
+
+          const app = initializeApp(firebaseConfig);
+          this.db = getFirestore(app);
+
+          // Authenticate if running inside workspace; if external GitHub Pages, allow direct Firestore test-mode connection
+          if (hasWorkspaceConfig) {
+            this.auth = getAuth(app);
+            if (typeof __initial_auth_token !== "undefined" && __initial_auth_token) {
+              await signInWithCustomToken(this.auth, __initial_auth_token);
+            } else {
+              await signInAnonymously(this.auth);
+            }
+            this.user = this.auth.currentUser;
+            if (!this.user) {
+              this.updateBadge("Offline Mode", "bg-amber-500/20 text-amber-200 border-amber-400/40", "bg-amber-400");
+              return false;
+            }
+          } else {
+            this.user = { uid: "github-pages-team" };
+          }
+
+          this.enabled = true;
+          this.updateBadge("Live Cloud Sync Active", "bg-emerald-500/20 text-emerald-200 border-emerald-400/40", "bg-emerald-400");
+
+          // Subscribe to shared public collections (Rule 1: /artifacts/{appId}/public/data/{collectionName})
+          const vendorsCol = collection(this.db, "artifacts", this.appId, "public", "data", "vendors");
+          const deletedCol = collection(this.db, "artifacts", this.appId, "public", "data", "deleted_vendors");
+          const settingsDoc = doc(this.db, "artifacts", this.appId, "public", "data", "settings", "team_roster");
+
+          let initialSeedChecked = false;
+
+          onSnapshot(
+            vendorsCol,
+            async (snapshot) => {
+              const remoteVendors = [];
+              snapshot.forEach((docSnap) => {
+                remoteVendors.push(docSnap.data());
+              });
+
+              if (!initialSeedChecked) {
+                initialSeedChecked = true;
+                if (remoteVendors.length === 0 && Array.isArray(window._initialLocalVendors) && window._initialLocalVendors.length > 0) {
+                  // Seed initial starter vendors into shared cloud database once
+                  for (const item of window._initialLocalVendors) {
+                    await this.saveVendor(item);
+                  }
+                  return;
+                }
+              }
+
+              this.ready = true;
+              onRemoteUpdateCallback({ type: "vendors", data: remoteVendors });
+            },
+            (err) => {
+              console.error("Vendors sync listener error:", err);
+              this.updateBadge("Sync Reconnecting...", "bg-amber-500/20 text-amber-200 border-amber-400/40", "bg-amber-400");
+            }
+          );
+
+          onSnapshot(
+            deletedCol,
+            (snapshot) => {
+              const remoteDeleted = [];
+              snapshot.forEach((docSnap) => {
+                remoteDeleted.push(docSnap.data());
+              });
+              onRemoteUpdateCallback({ type: "deleted", data: remoteDeleted });
+            },
+            (err) => {
+              console.error("Deleted archive sync listener error:", err);
+            }
+          );
+
+          onSnapshot(
+            settingsDoc,
+            async (docSnap) => {
+              if (docSnap.exists() && Array.isArray(docSnap.data().roster)) {
+                onRemoteUpdateCallback({ type: "roster", data: docSnap.data().roster });
+              } else if (Array.isArray(window._initialLocalRoster) && window._initialLocalRoster.length > 0) {
+                await this.saveTeamRoster(window._initialLocalRoster);
+              }
+            },
+            (err) => {
+              console.error("Team roster sync listener error:", err);
+            }
+          );
+
+          return true;
+        } catch (err) {
+          console.error("CloudSync init fallback:", err);
+          this.updateBadge("Local Mode (Backup JSON)", "bg-amber-500/20 text-amber-200 border-amber-400/40", "bg-amber-400");
+          return false;
+        }
+      },
+
+      updateBadge(label, pillClasses, dotClass) {
+        const badge = document.getElementById("cloudSyncBadge");
+        const dot = document.getElementById("cloudSyncDot");
+        const text = document.getElementById("cloudSyncText");
+        if (badge) {
+          badge.className = `inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border ${pillClasses}`;
+        }
+        if (dot) {
+          dot.className = `w-2 h-2 rounded-full ${dotClass}`;
+        }
+        if (text) {
+          text.textContent = label;
+        }
+      },
+
+      async saveVendor(vendorObj) {
+        if (!this.enabled || !this.user) return;
+        const ref = doc(this.db, "artifacts", this.appId, "public", "data", "vendors", vendorObj.id);
+        await setDoc(ref, vendorObj);
+      },
+
+      async removeVendor(vendorId) {
+        if (!this.enabled || !this.user) return;
+        const ref = doc(this.db, "artifacts", this.appId, "public", "data", "vendors", vendorId);
+        await deleteDoc(ref);
+      },
+
+      async saveDeletedVendor(archivedObj) {
+        if (!this.enabled || !this.user) return;
+        const ref = doc(this.db, "artifacts", this.appId, "public", "data", "deleted_vendors", archivedObj.id);
+        await setDoc(ref, archivedObj);
+      },
+
+      async removeDeletedVendor(vendorId) {
+        if (!this.enabled || !this.user) return;
+        const ref = doc(this.db, "artifacts", this.appId, "public", "data", "deleted_vendors", vendorId);
+        await deleteDoc(ref);
+      },
+
+      async saveTeamRoster(rosterArray) {
+        if (!this.enabled || !this.user) return;
+        const ref = doc(this.db, "artifacts", this.appId, "public", "data", "settings", "team_roster");
+        await setDoc(ref, { roster: rosterArray, updatedAt: new Date().toISOString() });
+      }
+    };
+  </script>
+
   <script>
     // 1. EXACT 14 SERVICE CAPABILITIES LIST
     const SERVICE_CAPABILITIES = [
@@ -1536,14 +1521,44 @@
     let currentClientSite = null; // { label, lat, lng, stateCode, city }
 
     // 5. INITIALIZATION ON WINDOW LOAD
-    window.onload = function () {
+    window.onload = async function () {
       loadTeamRoster();
       loadActiveUser();
       loadVendorsFromStorage();
+      window._initialLocalVendors = [...vendors];
+      window._initialLocalRoster = [...teamRoster];
+
       populateDropdownOptions();
       renderTeamDropdowns();
       renderAllViews();
       initLeafletMap();
+
+      // Connect Live Cloud Sync so all team members see real-time updates across browsers
+      if (window.CloudSync) {
+        await window.CloudSync.init((update) => {
+          if (update.type === "vendors") {
+            vendors = update.data.map(v => ({
+              ...v,
+              createdBy: v.createdBy || "Jowie Corrado",
+              createdAt: v.createdAt || "Nov 10, 2026, 9:00 AM",
+              updatedBy: v.updatedBy || v.createdBy || "Jowie Corrado",
+              updatedAt: v.updatedAt || v.createdAt || "Nov 10, 2026, 9:00 AM",
+              comments: Array.isArray(v.comments) ? v.comments : []
+            }));
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(vendors)); } catch (e) {}
+            renderAllViews();
+          } else if (update.type === "deleted") {
+            deletedVendors = update.data;
+            try { localStorage.setItem(DELETED_STORAGE_KEY, JSON.stringify(deletedVendors)); } catch (e) {}
+            renderAllViews();
+          } else if (update.type === "roster" && update.data.length > 0) {
+            teamRoster = update.data;
+            try { localStorage.setItem(TEAM_ROSTER_KEY, JSON.stringify(teamRoster)); } catch (e) {}
+            renderTeamDropdowns();
+            renderTeamRosterList();
+          }
+        });
+      }
     };
 
     function loadTeamRoster() {
@@ -1565,6 +1580,9 @@
       try {
         localStorage.setItem(TEAM_ROSTER_KEY, JSON.stringify(teamRoster));
       } catch (e) {}
+      if (window.CloudSync && window.CloudSync.enabled) {
+        window.CloudSync.saveTeamRoster(teamRoster);
+      }
     }
 
     function loadActiveUser() {
@@ -1789,9 +1807,19 @@
       }
     }
 
+    function syncVendorUpsertToCloud(vendorObj) {
+      saveVendorsToStorage();
+      if (window.CloudSync && window.CloudSync.enabled) {
+        window.CloudSync.saveVendor(vendorObj);
+      }
+    }
+
     function resetToSampleData() {
       vendors = JSON.parse(JSON.stringify(SAMPLE_VENDORS));
       saveVendorsToStorage();
+      if (window.CloudSync && window.CloudSync.enabled) {
+        vendors.forEach(v => window.CloudSync.saveVendor(v));
+      }
       renderAllViews();
       showToast("Restored Jowie's initial sample vendor dataset.");
     }
@@ -2646,7 +2674,7 @@
           text: "Promoted lead to Active Vendor Partner.",
           timestamp: now
         });
-        saveVendorsToStorage();
+        syncVendorUpsertToCloud(vendors[idx]);
         renderAllViews();
         showToast(`${vendors[idx].company} promoted to Active Vendor Partner by ${actorName}!`);
       });
@@ -2730,9 +2758,13 @@
       deletedVendors.unshift(archivedRecord);
       vendors = vendors.filter(item => item.id !== vendorId);
       saveVendorsToStorage();
+      if (window.CloudSync && window.CloudSync.enabled) {
+        window.CloudSync.saveDeletedVendor(archivedRecord);
+        window.CloudSync.removeVendor(vendorId);
+      }
       closeDeleteModal();
       renderAllViews();
-      showToast(`Moved ${v.company} to Deleted Leads Archive (by ${currentUserName}).`, "warning");
+      showToast(`Moved ${v.company} to Deleted Leads Archive (by ${actorName}).`, "warning");
     }
 
     // 9B. PAGE 4: DELETED LEADS & ARCHIVE LOG RENDERING & RESTORE
@@ -2838,6 +2870,10 @@
         vendors.unshift(restored);
         deletedVendors.splice(idx, 1);
         saveVendorsToStorage();
+        if (window.CloudSync && window.CloudSync.enabled) {
+          window.CloudSync.saveVendor(restored);
+          window.CloudSync.removeDeletedVendor(vendorId);
+        }
         renderAllViews();
         showToast(`Restored ${restored.company} to active directory (by ${actorName})!`);
       });
@@ -2913,7 +2949,7 @@
       vendors[idx].updatedBy = actorName;
       vendors[idx].updatedAt = now;
 
-      saveVendorsToStorage();
+      syncVendorUpsertToCloud(vendors[idx]);
       document.getElementById("threadCommentInput").value = "";
       renderCommentThreadFeed(vendors[idx]);
       renderAllViews();
@@ -3263,7 +3299,7 @@
         showToast(`Added ${vendorObj.company} (created by ${actorName})!`);
       }
 
-      saveVendorsToStorage();
+      syncVendorUpsertToCloud(vendorObj);
       closeVendorModal();
       renderAllViews();
     }
@@ -3750,6 +3786,10 @@
             return;
           }
           saveVendorsToStorage();
+          if (window.CloudSync && window.CloudSync.enabled) {
+            vendors.forEach(v => window.CloudSync.saveVendor(v));
+            deletedVendors.forEach(d => window.CloudSync.saveDeletedVendor(d));
+          }
           renderAllViews();
           showToast(`Restored ${vendors.length} vendors & team settings from backup!`);
         } catch (err) {
