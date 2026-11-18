@@ -1072,15 +1072,15 @@
     import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // =========================================================================
-    // GITHUB PAGES LIVE CLOUD SYNC SETUP
+    // NEW FIREBASE PROJECT CONFIG: agile-vendor-tracker
     // =========================================================================
     const EXTERNAL_CLOUD_CONFIG = {
-      apiKey: "AIzaSyA6AJNKfRWmvIAlbTLCZA6ToVre4GjRXD8",
-      authDomain: "agile-vendor-hub.firebaseapp.com",
-      projectId: "agile-vendor-hub",
-      storageBucket: "agile-vendor-hub.firebasestorage.app",
-      messagingSenderId: "726089281194",
-      appId: "1:726089281194:web:cbfa1e943e88f2811a2ad3"
+      apiKey: "AIzaSyAhnYKKPlXZyN0WZSOgDU-XgnXBW-7x3aU",
+      authDomain: "agile-vendor-tracker.firebaseapp.com",
+      projectId: "agile-vendor-tracker",
+      storageBucket: "agile-vendor-tracker.firebasestorage.app",
+      messagingSenderId: "53015507043",
+      appId: "1:53015507043:web:31d9c58ba5155def3bc856"
     };
 
     window.CloudSync = {
@@ -1089,7 +1089,7 @@
       db: null,
       auth: null,
       user: null,
-      appId: typeof __app_id !== "undefined" ? __app_id : "agile-facility-vendor-hub",
+      appId: typeof __app_id !== "undefined" ? __app_id : "agile-vendor-tracker",
 
       async init(onRemoteUpdateCallback) {
         try {
@@ -1131,25 +1131,14 @@
           const deletedCol = collection(this.db, "artifacts", this.appId, "public", "data", "deleted_vendors");
           const settingsDoc = doc(this.db, "artifacts", this.appId, "public", "data", "settings", "team_roster");
 
-          let initialSeedChecked = false;
-
+          // Pure real-time sync without auto-seeding deleted records back
           onSnapshot(
             vendorsCol,
-            async (snapshot) => {
+            (snapshot) => {
               const remoteVendors = [];
               snapshot.forEach((docSnap) => {
                 remoteVendors.push(docSnap.data());
               });
-
-              if (!initialSeedChecked) {
-                initialSeedChecked = true;
-                if (remoteVendors.length === 0 && Array.isArray(window._initialLocalVendors) && window._initialLocalVendors.length > 0) {
-                  for (const item of window._initialLocalVendors) {
-                    await this.saveVendor(item);
-                  }
-                  return;
-                }
-              }
 
               this.ready = true;
               onRemoteUpdateCallback({ type: "vendors", data: remoteVendors });
@@ -1353,161 +1342,11 @@
       "nashua": { lat: 42.7654, lng: -71.4677, state: "NH" }
     };
 
-    // 3. SAMPLE VENDORS WITH 3-TIER STATUS (Active, Available, Lead)
-    const SAMPLE_VENDORS = [
-      {
-        id: "v-101",
-        status: "Active",
-        company: "Gulf Coast Total Facility Services",
-        repName: "Carlos Mendoza",
-        position: "CEO",
-        email: "cmendoza@gulfcoastfacility.com",
-        phone: "(813) 555-0194",
-        street: "4820 W Kennedy Blvd, Suite 300",
-        hqCity: "Tampa",
-        hqState: "FL",
-        lat: 27.9452,
-        lng: -82.5256,
-        coverageStates: ["FL"],
-        statewide: true,
-        coverageCities: ["Tampa, FL", "Pompano Beach, FL", "Miami, FL", "Orlando, FL", "Jacksonville, FL"],
-        services: [
-          "Janitorial, Housekeeping and Custodial",
-          "Controlled Environment Cleaning",
-          "Specialty Surface Restoration and Maintenance",
-          "Parking Lot Cleaning"
-        ],
-        notes: "Active contract & site assignment. COI & W-9 verified.",
-        createdBy: "Jowie Corrado",
-        createdAt: "Nov 10, 2026, 9:15 AM",
-        updatedBy: "Jowie Corrado",
-        updatedAt: "Nov 14, 2026, 2:30 PM",
-        comments: [
-          { id: "c-1", author: "Jowie Corrado", text: "Verified statewide Florida coverage with Carlos Mendoza.", timestamp: "Nov 14, 2026, 2:30 PM" }
-        ]
-      },
-      {
-        id: "v-102",
-        status: "Available",
-        company: "Lone Star Mechanical & HVAC Pros",
-        repName: "Rebecca Vance",
-        position: "Business Owner",
-        email: "rvance@lonestarhvacpros.com",
-        phone: "(214) 555-0148",
-        street: "1910 Pacific Ave",
-        hqCity: "Dallas",
-        hqState: "TX",
-        lat: 32.7825,
-        lng: -96.7954,
-        coverageStates: ["TX", "OK"],
-        statewide: true,
-        coverageCities: ["Dallas, TX", "Fort Worth, TX", "Austin, TX", "Houston, TX", "Oklahoma City, OK"],
-        services: [
-          "HVAC Maintenance and Repair",
-          "Lighting Services",
-          "Handyman Services"
-        ],
-        notes: "Fully onboarded partner, currently awaiting active site account assignment.",
-        createdBy: "Jowie Corrado",
-        createdAt: "Nov 11, 2026, 10:05 AM",
-        updatedBy: "Jowie Corrado",
-        updatedAt: "Nov 11, 2026, 10:05 AM",
-        comments: []
-      },
-      {
-        id: "v-103",
-        status: "Active",
-        company: "Peachtree Commercial Grounds & Security",
-        repName: "Marcus Sterling",
-        position: "Operations Manager",
-        email: "msterling@peachtreecommercial.com",
-        phone: "(404) 555-0172",
-        street: "750 Peachtree St NE",
-        hqCity: "Atlanta",
-        hqState: "GA",
-        lat: 33.7748,
-        lng: -84.3849,
-        coverageStates: ["GA", "SC", "NC"],
-        statewide: false,
-        coverageCities: ["Atlanta, GA", "Savannah, GA", "Charlotte, NC", "Greenville, SC"],
-        services: [
-          "Grounds, Landscaping and Snow Removal",
-          "Security Guard Services",
-          "Parking Lot Cleaning"
-        ],
-        notes: "Active security & landscaping contract on GA regional sites.",
-        createdBy: "Jowie Corrado",
-        createdAt: "Nov 11, 2026, 1:20 PM",
-        updatedBy: "Jowie Corrado",
-        updatedAt: "Nov 11, 2026, 1:20 PM",
-        comments: []
-      },
-      {
-        id: "v-104",
-        status: "Available",
-        company: "Midwest Industrial & Disaster Response",
-        repName: "Elena Rostova",
-        position: "CEO",
-        email: "elena@midwestidr.com",
-        phone: "(312) 555-0163",
-        street: "540 W Madison St",
-        hqCity: "Chicago",
-        hqState: "IL",
-        lat: 41.8819,
-        lng: -87.6417,
-        coverageStates: ["IL", "IN", "WI", "MI"],
-        statewide: true,
-        coverageCities: ["Chicago, IL", "Indianapolis, IN", "Milwaukee, WI", "Detroit, MI"],
-        services: [
-          "Industrial Cleaning",
-          "Disaster Recovery",
-          "Controlled Environment Cleaning",
-          "Specialty Surface Restoration and Maintenance"
-        ],
-        notes: "Onboarded disaster recovery partner ready for emergency dispatch.",
-        createdBy: "Jowie Corrado",
-        createdAt: "Nov 12, 2026, 8:45 AM",
-        updatedBy: "Jowie Corrado",
-        updatedAt: "Nov 12, 2026, 8:45 AM",
-        comments: []
-      },
-      {
-        id: "v-105",
-        status: "Lead",
-        company: "Buckeye Shield Pest & Locksmith Group",
-        repName: "Derrick Holloway",
-        position: "Admin Representative",
-        email: "dispatch@buckeyeshield.com",
-        phone: "(614) 555-0129",
-        street: "250 E Broad St",
-        hqCity: "Columbus",
-        hqState: "OH",
-        lat: 39.9625,
-        lng: -82.9935,
-        coverageStates: ["OH", "PA", "KY"],
-        statewide: true,
-        coverageCities: ["Columbus, OH", "Cleveland, OH", "Cincinnati, OH", "Pittsburgh, PA"],
-        services: [
-          "Pest control",
-          "Locksmith Services",
-          "Handyman Services"
-        ],
-        notes: "Lead in final vetting & COI review.",
-        createdBy: "Jowie Corrado",
-        createdAt: "Nov 13, 2026, 3:10 PM",
-        updatedBy: "Jowie Corrado",
-        updatedAt: "Nov 15, 2026, 11:00 AM",
-        comments: [
-          { id: "c-2", author: "Jowie Corrado", text: "Requested updated Certificate of Insurance from Derrick.", timestamp: "Nov 15, 2026, 11:00 AM" }
-        ]
-      }
-    ];
-
-    // 4. APPLICATION STATE
-    const STORAGE_KEY = "agile_facility_vendors_jowie_v2";
-    const DELETED_STORAGE_KEY = "agile_facility_deleted_vendors_jowie_v2";
-    const USER_STORAGE_KEY = "agile_facility_active_user_v2";
-    const TEAM_ROSTER_KEY = "agile_facility_team_roster_v2";
+    // 3. APPLICATION STATE (Fresh storage keys for clean slate)
+    const STORAGE_KEY = "agile_facility_vendors_jowie_v3";
+    const DELETED_STORAGE_KEY = "agile_facility_deleted_vendors_jowie_v3";
+    const USER_STORAGE_KEY = "agile_facility_active_user_v3";
+    const TEAM_ROSTER_KEY = "agile_facility_team_roster_v3";
 
     const DEFAULT_TEAM_ROSTER = [
       { name: "Jowie Corrado", role: "Vendor Coordinator" },
@@ -1536,12 +1375,11 @@
     let routeLinesLayer = null;
     let currentClientSite = null;
 
-    // 5. INITIALIZATION ON WINDOW LOAD
+    // 4. INITIALIZATION ON WINDOW LOAD
     window.onload = async function () {
       loadTeamRoster();
       loadActiveUser();
       loadVendorsFromStorage();
-      window._initialLocalVendors = [...vendors];
       window._initialLocalRoster = [...teamRoster];
 
       populateDropdownOptions();
@@ -1802,7 +1640,6 @@
       window.CloudSync.updateBadge("Local Mode (Sync Disconnected)", "bg-rose-500/20 text-rose-200 border-rose-400/40", "bg-rose-400");
       closeCloudSyncAuthModal();
 
-      // Log security event to Deleted Leads & Archive Log
       const securityLogRecord = {
         id: `sec-${Date.now()}`,
         status: "Security Event",
@@ -1848,7 +1685,7 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed)) {
             vendors = parsed.map(v => ({
               ...v,
               status: v.status === "Active" ? "Active" : (v.status === "Available" ? "Available" : "Lead"),
@@ -1869,10 +1706,6 @@
         }
       } catch (e) {
         console.error("Failed to read localStorage:", e);
-      }
-      if (vendors.length === 0) {
-        vendors = JSON.parse(JSON.stringify(SAMPLE_VENDORS));
-        saveVendorsToStorage();
       }
     }
 
@@ -2045,6 +1878,9 @@
       const recentList = document.getElementById("recentVendorsList");
       recentList.innerHTML = "";
       const spotlight = [...vendors].reverse().slice(0, 4);
+      if (spotlight.length === 0) {
+        recentList.innerHTML = `<p class="text-xs text-slate-400 italic">No vendors added yet. Click "+ Add Vendor / Lead" to get started.</p>`;
+      }
       spotlight.forEach(v => {
         const isLead = v.status === "Lead";
         const isAvail = v.status === "Available";
@@ -2388,7 +2224,7 @@
       switchPage("directory");
     }
 
-    // DIRECTORY FILTERING & RENDERING (With City, State Search support)
+    // DIRECTORY FILTERING & RENDERING
     function getFilteredDirectoryVendors() {
       const searchEl = document.getElementById("filterSearch");
       const statusEl = document.getElementById("filterStatus");
@@ -2881,14 +2717,20 @@
       });
     }
 
-    function clearAllDeletedArchive() {
+    async function clearAllDeletedArchive() {
       if (deletedVendors.length === 0) {
         showToast("Archive log is already empty.");
         return;
       }
-      requireTeamIdentity("Select your name to clear the entire archive log:", (actorName) => {
+      requireTeamIdentity("Select your name to clear the entire archive log:", async (actorName) => {
+        const itemsToRemove = [...deletedVendors];
         deletedVendors = [];
         saveVendorsToStorage();
+        if (window.CloudSync && window.CloudSync.enabled) {
+          for (const item of itemsToRemove) {
+            await window.CloudSync.removeDeletedVendor(item.id);
+          }
+        }
         renderAllViews();
         showToast(`Cleared entire archive log (by ${actorName}).`, "warning");
       });
@@ -3003,7 +2845,7 @@
       showToast(`Comment posted by ${actorName}!`);
     }
 
-    // STATE NORMALIZATION HELPER (converts "New Hampshire" or "NH" -> "NH")
+    // STATE NORMALIZATION HELPER
     function standardizeStateCode(stateInput) {
       if (!stateInput) return "";
       const clean = stateInput.trim();
@@ -3012,7 +2854,7 @@
       return match ? match.code : clean.substring(0, 2).toUpperCase();
     }
 
-    // SMART BULK COVERAGE PARSER AUTOMATION (City, State Code format)
+    // SMART BULK COVERAGE PARSER AUTOMATION
     function parseAndAddBulkCoverage() {
       const textarea = document.getElementById("bulkCoverageInput");
       const rawText = textarea.value.trim();
@@ -3021,26 +2863,22 @@
         return;
       }
 
-      // Split by newline, semicolon, or comma
       const chunks = rawText.split(/[\n;,]+/).map(s => s.trim()).filter(Boolean);
       let addedCount = 0;
 
-      // Group consecutive chunks if they represent City + State (e.g., ["Manchester", "New Hampshire", "Nashua", "New Hampshire"])
       for (let i = 0; i < chunks.length; i++) {
         let cityPart = chunks[i];
         let statePart = "";
 
-        // Check if next chunk is a state name or code
         if (i + 1 < chunks.length) {
           const nextChunk = chunks[i + 1];
           const stMatch = US_STATES.find(s => s.code.toLowerCase() === nextChunk.toLowerCase() || s.name.toLowerCase() === nextChunk.toLowerCase());
           if (stMatch) {
             statePart = stMatch.code;
-            i++; // skip next chunk
+            i++;
           }
         }
 
-        // If statePart wasn't found in next chunk, try to extract state from current chunk (e.g., "Manchester, NH" or "Manchester New Hampshire")
         if (!statePart) {
           for (const st of US_STATES) {
             const regex = new RegExp(`\\b(${st.code}|${st.name})\\b`, "i");
@@ -3212,7 +3050,6 @@
       let val = input.value.trim();
       if (!val) return;
 
-      // Normalize if user typed e.g. "Manchester, New Hampshire" -> "Manchester, NH"
       for (const st of US_STATES) {
         const regex = new RegExp(`\\b${st.name}\\b`, "i");
         if (regex.test(val)) {
@@ -3223,7 +3060,6 @@
 
       if (!modalTempCities.includes(val)) {
         modalTempCities.push(val);
-        // Extract state code if present at the end
         const parts = val.split(",");
         if (parts.length > 1) {
           const stCode = standardizeStateCode(parts[parts.length - 1]);
@@ -3707,11 +3543,32 @@
     }
 
     function copyText(text, successMsg) {
-      navigator.clipboard.writeText(text).then(() => {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(successMsg);
+        }).catch(() => {
+          fallbackCopyText(text, successMsg);
+        });
+      } else {
+        fallbackCopyText(text, successMsg);
+      }
+    }
+
+    function fallbackCopyText(text, successMsg) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand("copy");
         showToast(successMsg);
-      }).catch(() => {
+      } catch (err) {
         showToast("Copied to clipboard!");
-      });
+      }
+      document.body.removeChild(textArea);
     }
 
     function exportFilteredCSV() {
